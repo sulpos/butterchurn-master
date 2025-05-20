@@ -13,6 +13,9 @@ $(function() {
   var presetCycleLength = 15000;
   var presetRandom = true;
   var canvas = document.getElementById('canvas');
+  // Add layers management variables
+  var layers = [];
+  var overlayCanvas = null;
 
   // Sequence management
   var presetSequence = [];  // Now each item will be {name: string, duration: number}
@@ -39,6 +42,9 @@ $(function() {
   function startRenderer() {
     requestAnimationFrame(() => startRenderer());
     visualizer.render();
+    if (layers.length > 0) {
+      renderLayers();
+    }
   }
 
   function playBufferSource(buffer) {
@@ -74,7 +80,6 @@ $(function() {
     } else {
       sourceNode.disconnect();
       sourceNode = null;
-      $("#audioSelectWrapper").css('display', 'block');
     }
   }
 
@@ -128,6 +133,108 @@ $(function() {
     if (presetCycle) {
       cycleInterval = setInterval(() => nextPreset(2.7), presetCycleLength);
     }
+  }
+
+  // Layer management functions
+  function createLayer(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const layer = {
+          image: img,
+          opacity: 1.0,
+          visible: true,
+          name: file.name
+        };
+        layers.push(layer);
+        updateLayersUI();
+        renderLayers();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateLayersUI() {
+    const layerControls = $('.layer-controls');
+    // Keep the add layer button
+    const addLayerButton = layerControls.find('#addLayer').detach();
+    const fileInput = layerControls.find('#layerImageUpload').detach();
+    
+    layerControls.empty().append(fileInput, addLayerButton);
+
+    layers.forEach((layer, index) => {
+      const layerItem = $('<div>')
+        .addClass('layer-item')
+        .html(`
+          <span class="layer-name">${layer.name}</span>
+          <div class="layer-opacity">
+            <label>Opacity:</label>
+            <input type="range" min="0" max="100" value="${layer.opacity * 100}" class="opacity-slider">
+            <span class="opacity-value">${Math.round(layer.opacity * 100)}%</span>
+          </div>
+          <button class="remove-layer">×</button>
+        `);
+
+      layerItem.find('.opacity-slider').on('input', function() {
+        layer.opacity = this.value / 100;
+        layerItem.find('.opacity-value').text(this.value + '%');
+        renderLayers();
+      });
+
+      layerItem.find('.remove-layer').on('click', function() {
+        layers.splice(index, 1);
+        updateLayersUI();
+        renderLayers();
+      });
+
+      layerControls.append(layerItem);
+    });
+  }
+
+  function renderLayers() {
+    if (!overlayCanvas) {
+      overlayCanvas = document.createElement('canvas');
+      overlayCanvas.style.position = 'absolute';
+      overlayCanvas.style.top = '0';
+      overlayCanvas.style.left = '0';
+      overlayCanvas.style.width = '100%';
+      overlayCanvas.style.height = '100%';
+      overlayCanvas.style.pointerEvents = 'none';
+      canvas.parentElement.appendChild(overlayCanvas);
+    }
+
+    // Match canvas dimensions
+    overlayCanvas.width = canvas.width;
+    overlayCanvas.height = canvas.height;
+
+    const ctx = overlayCanvas.getContext('2d');
+    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+    layers.forEach(layer => {
+      if (layer.visible) {
+        ctx.globalAlpha = layer.opacity;
+        // Draw image to fill the canvas while maintaining aspect ratio
+        const imgRatio = layer.image.width / layer.image.height;
+        const canvasRatio = overlayCanvas.width / overlayCanvas.height;
+        let drawWidth, drawHeight, x, y;
+
+        if (imgRatio > canvasRatio) {
+          drawHeight = overlayCanvas.height;
+          drawWidth = drawHeight * imgRatio;
+          x = (overlayCanvas.width - drawWidth) / 2;
+          y = 0;
+        } else {
+          drawWidth = overlayCanvas.width;
+          drawHeight = drawWidth / imgRatio;
+          x = 0;
+          y = (overlayCanvas.height - drawHeight) / 2;
+        }
+
+        ctx.drawImage(layer.image, x, y, drawWidth, drawHeight);
+      }
+    });
   }
 
   function updateProgressBar() {
@@ -385,6 +492,7 @@ $(function() {
     input.click();
   }
 
+  // Event Handlers
   $(document).keydown((e) => {
     if (e.which === 32 || e.which === 39) {
       nextPreset();
@@ -415,14 +523,31 @@ $(function() {
     presetRandom = $('#presetRandom').is(':checked');
   });
 
+  // Layer controls event handlers
+  $("#layersButton").click(function() {
+    $('#layersMenu').toggleClass('hidden');
+  });
+
+  $("#addLayer").click(function() {
+    $('#layerImageUpload').click();
+  });
+
+  $("#layerImageUpload").change(function(e) {
+    if (this.files && this.files[0]) {
+      createLayer(this.files[0]);
+    }
+  });
+
+  $(".hide-layers").click(function() {
+    $('#layersMenu').addClass('hidden');
+  });
+
   // Add keyboard shortcuts toggle
   $('.hide-shortcuts').click(function() {
     $('#keyboardShortcuts').addClass('hidden');
   });
 
   $("#localFileBut").click(function() {
-    $("#audioSelectWrapper").css('display', 'none');
-
     var fileSelector = $('<input type="file" accept="audio/*" multiple />');
 
     fileSelector[0].onchange = function(event) {
@@ -433,8 +558,6 @@ $(function() {
   });
 
   $("#micSelect").click(() => {
-    $("#audioSelectWrapper").css('display', 'none');
-
     navigator.getUserMedia({ audio: true }, (stream) => {
       var micSourceNode = audioContext.createMediaStreamSource(stream);
       connectMicAudio(micSourceNode, audioContext);
@@ -476,11 +599,14 @@ $(function() {
       textureRatio: 1,
     });
 
-    // Update canvas size on window resize
+    // Handle window resize for both canvases
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       visualizer.setRendererSize(window.innerWidth, window.innerHeight);
+      if (overlayCanvas) {
+        renderLayers();
+      }
     });
 
     nextPreset(0);

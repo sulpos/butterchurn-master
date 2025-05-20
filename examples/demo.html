@@ -38,6 +38,13 @@
           <line x1="8" y1="23" x2="16" y2="23"></line>
         </svg>
       </button>
+      <button class="audio-button" id="layersButton" title="Image Layers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+      </button>
       <div class="control-group">
         <select id="presetSelect"></select>
       </div>
@@ -53,17 +60,17 @@
       </div>
     </div>
     <div id="bottomBar">
+      <button class="timeline-button" id="playSequence">
+        <svg class="play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        <svg class="pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="6" y1="4" x2="6" y2="20"></line>
+          <line x1="18" y1="4" x2="18" y2="20"></line>
+        </svg>
+      </button>
       <div id="timeline"></div>
       <div class="timeline-controls">
-        <button class="timeline-button" id="playSequence">
-          <svg class="play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          <svg class="pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="6" y1="4" x2="6" y2="20"></line>
-            <line x1="18" y1="4" x2="18" y2="20"></line>
-          </svg>
-        </button>
         <button class="timeline-button" id="addPreset">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -85,6 +92,30 @@
             <line x1="12" y1="3" x2="12" y2="15"></line>
           </svg>
         </button>
+      </div>
+    </div>
+    <div id="layersMenu" class="hidden">
+      <button class="hide-layers">×</button>
+      <h3>Image Layers</h3>
+      <div class="layer-controls">
+        <input type="file" id="layerImageUpload" accept="image/png,image/jpeg" class="hidden">
+        <button class="layer-button" id="addLayer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Add Image Layer
+        </button>
+        <div class="layer-item hidden">
+          <span class="layer-name">Layer 1</span>
+          <div class="layer-opacity">
+            <label>Opacity:</label>
+            <input type="range" min="0" max="100" value="100" class="opacity-slider">
+            <span class="opacity-value">100%</span>
+          </div>
+          <button class="remove-layer">×</button>
+        </div>
       </div>
     </div>
     <div id="keyboardShortcuts">
