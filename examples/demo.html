@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Susul Vis</title>
+  <meta name="description" content="Butterchurn Demo Example">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script type="text/javascript" src="https://unpkg.com/lodash"></script>
+  <script type="text/javascript" src="https://unpkg.com/butterchurn"></script>
+  <script type="text/javascript" src="https://unpkg.com/butterchurn-presets"></script>
+  <script type="text/javascript" src="https://unpkg.com/butterchurn-presets/lib/butterchurnPresetsExtra.min.js"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="demo.css">
+  <script type="text/javascript" src="demo.js"></script>
+</head>
+<body>
+  <div id="mainWrapper">
+    <canvas id='canvas' width='800' height='600'></canvas>
+    <div id="controlBar">
+      <div class="app-title">Susul Vis</div>
+      <button class="audio-button" id="localFileBut" title="Load Local Files">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="21" cy="16" r="3"></circle>
+        </svg>
+      </button>
+      <button class="audio-button" id="micSelect" title="Use Microphone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+      </button>
+      <div class="control-group">
+        <select id="presetSelect"></select>
+      </div>
+      <div class="control-group">
+        <label>Auto Cycle</label>
+        <input type="checkbox" id="presetCycle" checked>
+        <input type="number" id="presetCycleLength" step="1" value="15" min="1">
+        <label>sec</label>
+      </div>
+      <div class="control-group">
+        <label>Random Order</label>
+        <input type="checkbox" id="presetRandom" checked>
+      </div>
+    </div>
+    <div id="bottomBar">
+      <div id="timeline"></div>
+      <div class="timeline-controls">
+        <button class="timeline-button" id="playSequence">
+          <svg class="play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg class="pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="6" y1="4" x2="6" y2="20"></line>
+            <line x1="18" y1="4" x2="18" y2="20"></line>
+          </svg>
+        </button>
+        <button class="timeline-button" id="addPreset">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add to Timeline
+        </button>
+        <button class="timeline-button" id="saveSequence">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+        </button>
+        <button class="timeline-button" id="loadSequence">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="keyboardShortcuts">
+      <button class="hide-shortcuts">×</button>
+      Keyboard Shortcuts
+      <ul>
+        <li><span class="key">→</span> or <span class="key">Space</span> Next preset</li>
+        <li><span class="key">←</span> or <span class="key">Backspace</span> Previous preset</li>
+        <li><span class="key">H</span> Quick switch</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

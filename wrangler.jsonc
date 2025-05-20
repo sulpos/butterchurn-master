@@ -1,0 +1,15 @@
+{
+  "name": "arbeittrak-worker",
+  "compatibility_date": "2025-05-20",
+  "main": "worker.js",
+  "kv_namespaces": [
+    {
+      "binding": "ATTENDANCE_DB",
+      "id": "your-kv-namespace-id"
+    }
+  ],
+  "site": {
+    "bucket": ".",
+    "include": ["*.html", "*.css", "*.js", "!worker.js", "!node_modules/**/*"]
+  }
+}
